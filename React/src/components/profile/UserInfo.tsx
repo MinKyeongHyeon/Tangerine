@@ -23,6 +23,7 @@ function UserInfo({ isMyProfile, userAccountName }: UserInfoProps) {
   const navigate = useNavigate();
   const [userAccount, setUserAccount] = useState('');
   const [accountName, setAccountName] = useState('');
+  const [myAccount, setMyAccount] = useState('');
   const [profileData, setProfileData] = useState<UserAPI.IUserProfile>({} as UserAPI.IUserProfile);
   const [loading, setLoading] = useState(false);
 
@@ -36,6 +37,7 @@ function UserInfo({ isMyProfile, userAccountName }: UserInfoProps) {
         const profileData = await profileAPI.getProfile(myData.user.accountname);
         setAccountName(myData.user.accountname);
         setProfileData(profileData.profile);
+        setUserAccount(myData.user.accountname);
       } catch (error: any) {
         console.error('프로필 정보 조회 실패:', error.message);
       } finally {
@@ -46,9 +48,10 @@ function UserInfo({ isMyProfile, userAccountName }: UserInfoProps) {
 
     if (!isMyProfile && userAccountName) {
       try {
-        const userData = await userAPI.getMyInfo();
-        setUserAccount(userData.user.accountname);
-        const res = await profileAPI.getProfile(userData.user.accountname);
+        const myData = await userAPI.getMyInfo();
+        setUserAccount(myData.user.accountname);
+
+        const res = await profileAPI.getProfile(userAccountName);
         setAccountName(userAccountName);
         setProfileData(res.profile);
       } catch (error: any) {
@@ -76,9 +79,14 @@ function UserInfo({ isMyProfile, userAccountName }: UserInfoProps) {
     });
   }
 
+  // 팔로우 변경 후 부모에서 프로필 재조회
+  async function handleFollowChange() {
+    await getUserProfile();
+  }
+
   useEffect(() => {
     getUserProfile();
-  }, [accountName]);
+  }, [isMyProfile, userAccountName]);
 
   return (
     <section className="flex flex-col items-center gap-4 pt-[30px] pb-6 bg-white">
@@ -153,6 +161,7 @@ function UserInfo({ isMyProfile, userAccountName }: UserInfoProps) {
               btnSize="medium"
               userAccount={profileData.accountname}
               isFollow={profileData.isfollow}
+              onFollowChange={handleFollowChange}
             />
             <button
               className="flex items-center justify-center w-[34px] h-[34px] rounded-full border-[1px] border-[#DBDBDB]
