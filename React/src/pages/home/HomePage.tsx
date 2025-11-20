@@ -73,56 +73,55 @@ function HomePage() {
       {isFirst ? (
         <Splash />
       ) : (
-        <>
-          {loading && <>로딩중...</>}
+        <div>
+          <Header navStyle="top-main" />
 
-          {!loading && (
-            <div>
-              <Header navStyle="top-main" />
-
-              {posts.length > 0 && (
-                <div className="pb-[60px]">
-                  <ul className="flex flex-col items-center gap-5 pt-5 px-4">
-                    {posts.map((post) => (
-                      <Posting
-                        isMyProfile={false}
-                        // 포스팅 컴포넌트에 대한 key
-                        key={post.id}
-                        // 각 게시글의 고유 id
-                        postId={post.id}
-                        // 각 게시글 모든 내용(navigate의 state 값으로 넘기기 위한 props)
-                        hearted={post.hearted}
-                        post={post}
-                        userProfileImage={post.author.image}
-                        userName={post.author.username}
-                        userId={post.author.accountname}
-                        userContent={post.content}
-                        contentImage={post.image}
-                        heartCount={post.heartCount}
-                        commentCount={post.commentCount}
-                        updatedAt={post.updatedAt}
-                      />
-                    ))}
-                  </ul>
-                </div>
-              )}
-              {posts.length === 0 && (
-                <div className="mt-[220px] flex flex-col items-center gap-[20px] pb-[60px]">
-                  <img src={Symbol} alt="로고" />
-                  <p className="text-[#767676]">유저를 검색해 팔로우 해보세요!</p>
-                  <button
-                    onClick={() => navigate('/search-page')}
-                    type="button"
-                    className="w-[120px] h-[44px] bg-[#f26e22] text-sm text-white rounded-full"
-                  >
-                    검색하기
-                  </button>
-                </div>
-              )}
-              <Footer />
+          {loading && (
+            <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+              <p className="text-[#767676]">로딩중...</p>
             </div>
           )}
-        </>
+
+          {!loading && posts.length > 0 && (
+            <div className="pb-[60px]">
+              <ul className="flex flex-col items-center gap-5 pt-5 px-4">
+                {posts.map((post) => (
+                  <Posting
+                    isMyProfile={false}
+                    key={post.id}
+                    postId={post.id}
+                    hearted={post.hearted}
+                    post={post}
+                    userProfileImage={post.author.image}
+                    userName={post.author.username}
+                    userId={post.author.accountname}
+                    userContent={post.content}
+                    contentImage={post.image}
+                    heartCount={post.heartCount}
+                    commentCount={post.commentCount}
+                    updatedAt={post.updatedAt}
+                  />
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {!loading && posts.length === 0 && (
+            <div className="mt-[220px] flex flex-col items-center gap-[20px] pb-[60px]">
+              <img src={Symbol} alt="로고" />
+              <p className="text-[#767676]">유저를 검색해 팔로우 해보세요!</p>
+              <button
+                onClick={() => navigate('/search-page')}
+                type="button"
+                className="w-[120px] h-[44px] bg-[#f26e22] text-sm text-white rounded-full"
+              >
+                검색하기
+              </button>
+            </div>
+          )}
+
+          <Footer />
+        </div>
       )}
     </>
   );
