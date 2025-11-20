@@ -24,9 +24,17 @@ function getButtonColor(color: ButtonColorType) {
   return BUTTON_COLORS[color] || BUTTON_COLORS.normal;
 }
 
-function FollowToggleButton({ followText, unfollowText, btnSize, userAccount, isFollow }: IFollowToggleButtonType) {
+// onFollowChange 콜백을 optional로 허용하도록 타입 확장
+function FollowToggleButton(props: IFollowToggleButtonType & { onFollowChange?: () => Promise<void> | void }) {
+  const { followText, unfollowText, btnSize, userAccount, isFollow, onFollowChange } = props;
+
   // 현재 팔로우 상태를 관리
   const [isFollowing, setIsFollowing] = useState(isFollow);
+
+  // 부모에서 isFollow prop이 변경될 수 있으니 동기화
+  useEffect(() => {
+    setIsFollowing(isFollow);
+  }, [isFollow]);
 
   // 팔로우/언팔로우 핸들러
   async function handleFollowToggle() {
@@ -37,6 +45,16 @@ function FollowToggleButton({ followText, unfollowText, btnSize, userAccount, is
       } else {
         const res = await profileAPI.follow(userAccount);
         setIsFollowing(res.profile.isfollow);
+      }
+
+      // 성공 시 부모에게 변경 알림(있으면 호출)
+      if (onFollowChange) {
+        try {
+          await onFollowChange();
+        } catch (err) {
+          // 부모 콜백 실패는 로깅만
+          console.error('onFollowChange 콜백 실패', err);
+        }
       }
     } catch (error: any) {
       console.error('팔로우 또는 언팔로우를 실패하였습니다.', error.message);
